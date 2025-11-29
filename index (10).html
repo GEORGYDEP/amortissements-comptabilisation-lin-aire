@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compta-Master - Amortissements</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM (UMD) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      /* === FOND DE MONTAGNES PRINTANIÈRES === */
+      body {
+        background: linear-gradient(180deg, 
+          rgba(135, 206, 235, 0.3) 0%, 
+          rgba(152, 251, 152, 0.2) 50%, 
+          rgba(255, 250, 205, 0.3) 100%),
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%2387CEEB;stop-opacity:0.3" /><stop offset="100%" style="stop-color:%23E0F6FF;stop-opacity:0.2" /></linearGradient><linearGradient id="mountain1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%234A5F4A;stop-opacity:0.8" /><stop offset="100%" style="stop-color:%2370A070;stop-opacity:0.6" /></linearGradient><linearGradient id="mountain2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%235C7A5C;stop-opacity:0.7" /><stop offset="100%" style="stop-color:%2385B085;stop-opacity:0.5" /></linearGradient><linearGradient id="mountain3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%236B8E6B;stop-opacity:0.6" /><stop offset="100%" style="stop-color:%2398D098;stop-opacity:0.4" /></linearGradient></defs><rect width="1200" height="600" fill="url(%23sky)"/><path d="M 0 350 Q 150 280 300 300 T 600 280 L 600 600 L 0 600 Z" fill="url(%23mountain1)"/><path d="M 200 380 Q 400 300 600 340 T 1000 320 L 1000 600 L 200 600 Z" fill="url(%23mountain2)"/><path d="M 400 400 Q 650 330 900 380 T 1200 360 L 1200 600 L 400 600 Z" fill="url(%23mountain3)"/><circle cx="150" cy="150" r="3" fill="%23FFB6C1" opacity="0.6"/><circle cx="180" cy="165" r="3" fill="%23FFB6C1" opacity="0.6"/><circle cx="200" cy="155" r="3" fill="%23FFC0CB" opacity="0.7"/><circle cx="220" cy="170" r="3" fill="%23FFB6C1" opacity="0.6"/><circle cx="450" cy="180" r="3" fill="%23FFD4E5" opacity="0.5"/><circle cx="480" cy="195" r="3" fill="%23FFB6C1" opacity="0.6"/><circle cx="500" cy="185" r="3" fill="%23FFC0CB" opacity="0.7"/><circle cx="750" cy="160" r="3" fill="%23FFD4E5" opacity="0.5"/><circle cx="780" cy="175" r="3" fill="%23FFB6C1" opacity="0.6"/><circle cx="800" cy="165" r="3" fill="%23FFC0CB" opacity="0.7"/><circle cx="950" cy="190" r="3" fill="%23FFD4E5" opacity="0.5"/><circle cx="980" cy="205" r="3" fill="%23FFB6C1" opacity="0.6"/></svg>');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        min-height: 100vh;
+      }
+
+      /* === EFFET VERRE (Glass Morphism) === */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Hide number input spinners */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type=number] {
+        -moz-appearance: textfield;
+      }
+      
+      /* === ANIMATIONS AMÉLIORÉES === */
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-slide-up {
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      @keyframes pulse-soft {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.85; transform: scale(1.05); }
+      }
+      .animate-pulse-soft {
+        animation: pulse-soft 2.5s ease-in-out infinite;
+      }
+
+      /* === EFFETS DE SURVOL === */
+      .hover-lift {
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      /* === BOUTONS MODERNES === */
+      .btn-modern {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+      .btn-modern:hover::before {
+        width: 300px;
+        height: 300px;
+      }
+      .btn-modern:active {
+        transform: scale(0.97);
+      }
+
+      /* === FOCUS GLOW === */
+      input:focus {
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      /* === TEXTE GRADIENT === */
+      .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        // --- ICONS ---
+        // Inline SVG components to avoid external dependencies
+        const IconCheck = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>;
+        const IconX = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+        const IconHelp = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>;
+        const IconChevronRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 18 15 12 9 6"></polyline></svg>;
+        const IconRefresh = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>;
+        const IconBook = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>;
+        const IconTrophy = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10"></path><path d="M17 4v7a5 5 0 0 1-10 0V4"></path><path d="M22 9a4 4 0 0 1-4 4"></path><path d="M2 9a4 4 0 0 0 4 4"></path></svg>;
+
+        // --- CONSTANTS & DATA ---
+        
+        const AmortizationType = { Linear: 'Lineaire', Degressive: 'Degressif' };
+        const Step = { Table: 'table', Accounting: 'accounting', BookValueCheck: 'book_value_check', Complete: 'complete' };
+
+        const exercises = [
+            {
+                id: 1,
+                type: AmortizationType.Linear,
+                assetName: 'Robot de soudure automatique',
+                acquisitionCost: 45000,
+                duration: 5,
+                description: "L'atelier s'équipe d'un robot de soudure automatique pour 45.000,00 €. Durée d'amortissement : 5 ans. Mode linéaire.",
+                debitAccount: '6302',
+                creditAccount: '2300',
+            },
+            {
+                id: 2,
+                type: AmortizationType.Linear,
+                assetName: 'Camion frigorifique Mercedes',
+                acquisitionCost: 36000,
+                duration: 4,
+                description: "Achat d'un camion frigorifique Mercedes pour le transport de produits frais : 36.000,00 €. Amortissement linéaire sur 4 ans.",
+                debitAccount: '6302',
+                creditAccount: '2410',
+            },
+            {
+                id: 3,
+                type: AmortizationType.Linear,
+                assetName: 'Presse hydraulique industrielle',
+                acquisitionCost: 24000,
+                duration: 3,
+                description: "Installation d'une presse hydraulique industrielle d'une valeur de 24.000,00 €. Durée d'utilisation : 3 ans. Amortissement linéaire.",
+                debitAccount: '6302',
+                creditAccount: '2300',
+            }
+        ];
+
+        // --- UTILS ---
+
+        const formatCurrency = (val) => new Intl.NumberFormat('fr-BE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
+        const parseInput = (val) => parseFloat(val.replace(/\s/g, '').replace(',', '.')) || 0;
+        const isCloseEnough = (a, b) => Math.abs(a - b) < 0.15;
+
+        const calculateSolution = (exercise) => {
+            const rows = [];
+            let currentVcn = exercise.acquisitionCost;
+            let accumulatedTotal = 0;
+            
+            const linearRate = 1 / exercise.duration;
+            const linearAnnuity = exercise.acquisitionCost * linearRate;
+            const degressiveRate = linearRate * 2;
+            const maxAnnuity = exercise.acquisitionCost * 0.40;
+
+            for (let year = 1; year <= exercise.duration; year++) {
+                if (currentVcn <= 0.01) break; // Asset is fully amortized
+
+                let annuity = 0;
+                // Linear Base = Acquisition Cost (Constant). Degressive Base = VCN (Variable).
+                const base = exercise.type === AmortizationType.Linear ? exercise.acquisitionCost : currentVcn;
+
+                if (exercise.type === AmortizationType.Linear) {
+                    annuity = linearAnnuity;
+                    if (year === exercise.duration) annuity = currentVcn; // Force closure
+                } else {
+                    let calcDegressive = base * degressiveRate;
+                    if (calcDegressive > maxAnnuity) calcDegressive = maxAnnuity; // Cap 40%
+
+                    // Switch to linear if degressive drops below linear annuity
+                    if (calcDegressive < linearAnnuity) {
+                        annuity = linearAnnuity;
+                    } else {
+                        annuity = calcDegressive;
+                    }
+                }
+
+                // Safety: Cannot amortize more than remaining VCN
+                if (annuity > currentVcn) annuity = currentVcn;
+                
+                // Rounding
+                annuity = Math.round(annuity * 100) / 100;
+                
+                // Final adjustment for floating point precision
+                if (Math.abs(currentVcn - annuity) < 1.0 && year >= exercise.duration) {
+                     annuity = currentVcn;
+                }
+
+                accumulatedTotal += annuity;
+                const newVcn = currentVcn - annuity;
+
+                rows.push({
+                    year,
+                    base: parseFloat(base.toFixed(2)),
+                    annuity: parseFloat(annuity.toFixed(2)),
+                    accumulated: parseFloat(accumulatedTotal.toFixed(2)),
+                    vcn: parseFloat(newVcn.toFixed(2)),
+                });
+
+                currentVcn = newVcn;
+            }
+            return rows;
+        };
+
+        // --- UI COMPONENTS ---
+
+        const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+            const variants = {
+                primary: "btn-modern bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white focus:ring-indigo-500 shadow-lg hover:shadow-xl",
+                secondary: "btn-modern bg-white text-slate-700 border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 focus:ring-slate-400 shadow-md hover:shadow-lg",
+                success: "btn-modern bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white focus:ring-emerald-500 shadow-lg hover:shadow-xl",
+            };
+            return (
+                <button 
+                    className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${variants[variant]} ${className}`} 
+                    {...props}
+                >
+                    {children}
+                </button>
+            );
+        };
+
+        // --- EXERCISE COMPONENTS ---
+
+        const TableStep = ({ exercise, onComplete }) => {
+            const solution = useMemo(() => calculateSolution(exercise), [exercise]);
+            const [rowIndex, setRowIndex] = useState(0);
+            const [completedRows, setCompletedRows] = useState([]);
+            const [inputs, setInputs] = useState({ base: '', annuity: '', accumulated: '', vcn: '' });
+            const [error, setError] = useState(null);
+            const [fieldErrors, setFieldErrors] = useState({});
+            const [fieldCorrect, setFieldCorrect] = useState({});
+            const baseInputRef = useRef(null);
+
+            useEffect(() => {
+                setRowIndex(0);
+                setCompletedRows([]);
+                setInputs({ base: '', annuity: '', accumulated: '', vcn: '' });
+                setError(null);
+                setFieldErrors({});
+                setFieldCorrect({});
+                setTimeout(() => baseInputRef.current?.focus(), 50);
+            }, [exercise]);
+
+            const handleChange = (field, val) => {
+                setInputs(prev => ({ ...prev, [field]: val }));
+                
+                // Vérifier si la valeur est correcte en temps réel
+                const sol = solution[rowIndex];
+                if (sol && val) {
+                    const userVal = parseInput(val);
+                    const isCorrect = isCloseEnough(userVal, sol[field === 'base' ? 'base' : field === 'annuity' ? 'annuity' : field === 'accumulated' ? 'accumulated' : 'vcn']);
+                    
+                    setFieldCorrect(prev => ({ ...prev, [field]: isCorrect }));
+                    if (isCorrect) {
+                        setFieldErrors(prev => ({ ...prev, [field]: false }));
+                    }
+                } else {
+                    setFieldCorrect(prev => ({ ...prev, [field]: false }));
+                }
+                
+                setError(null);
+            };
+
+            const validate = () => {
+                const sol = solution[rowIndex];
+                if (!sol) return;
+
+                const userBase = parseInput(inputs.base);
+                const userAnnuity = parseInput(inputs.annuity);
+                const userAcc = parseInput(inputs.accumulated);
+                const userVcn = parseInput(inputs.vcn);
+
+                const errs = {};
+                let hasErr = false;
+
+                if (!isCloseEnough(userBase, sol.base)) { errs.base = true; hasErr = true; }
+                if (!isCloseEnough(userAnnuity, sol.annuity)) { errs.annuity = true; hasErr = true; }
+                if (!isCloseEnough(userAcc, sol.accumulated)) { errs.accumulated = true; hasErr = true; }
+                if (!isCloseEnough(userVcn, sol.vcn)) { errs.vcn = true; hasErr = true; }
+
+                setFieldErrors(errs);
+
+                if (hasErr) {
+                    return;
+                }
+
+                const newCompleted = [...completedRows, sol];
+                setCompletedRows(newCompleted);
+
+                if (rowIndex === solution.length - 1) {
+                    onComplete();
+                } else {
+                    setRowIndex(prev => prev + 1);
+                    setInputs({ base: '', annuity: '', accumulated: '', vcn: '' });
+                    setFieldCorrect({});
+                    setFieldErrors({});
+                    setTimeout(() => baseInputRef.current?.focus(), 50);
+                }
+            };
+
+            return (
+                <div className="glass-card rounded-2xl shadow-xl border border-white/50 overflow-hidden animate-slide-up hover-lift">
+                    <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 p-5 flex justify-between items-center">
+                        <h3 className="font-bold text-lg text-slate-800">Tableau d'amortissement ({exercise.type})</h3>
+                        <span className="text-xs font-bold bg-white/80 border border-slate-200 px-3 py-1.5 rounded-full text-slate-600 shadow-sm">
+                            Ligne {rowIndex + 1} / {solution.length}
+                        </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50/50 text-slate-500 font-medium border-b border-slate-100">
+                                <tr>
+                                    <th className="p-4 w-16">Année</th>
+                                    <th className="p-4">Base</th>
+                                    <th className="p-4">Annuité</th>
+                                    <th className="p-4 text-indigo-600">Cumul</th>
+                                    <th className="p-4">VCN</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {completedRows.map(row => (
+                                    <tr key={row.year} className="bg-emerald-50/30">
+                                        <td className="p-4 font-medium text-emerald-900">{row.year}</td>
+                                        <td className="p-4 text-slate-600">{formatCurrency(row.base)}</td>
+                                        <td className="p-4 text-slate-600">{formatCurrency(row.annuity)}</td>
+                                        <td className="p-4 font-medium text-indigo-700">{formatCurrency(row.accumulated)}</td>
+                                        <td className="p-4 font-bold text-slate-800">{formatCurrency(row.vcn)}</td>
+                                    </tr>
+                                ))}
+                                {rowIndex < solution.length && (
+                                    <tr className="bg-white">
+                                        <td className="p-4 font-bold text-indigo-600 align-middle">{solution[rowIndex].year}</td>
+                                        <td className="p-4">
+                                            <input ref={baseInputRef} type="text" placeholder="Base" className={`w-32 p-2 border-2 rounded-md outline-none focus:ring-2 transition-all text-right ${fieldErrors.base ? 'border-red-400 bg-red-50 focus:ring-red-200' : fieldCorrect.base ? 'border-green-400 bg-green-50 focus:ring-green-200' : 'border-slate-200 focus:ring-indigo-200 focus:border-indigo-400'}`} value={inputs.base} onChange={e => handleChange('base', e.target.value)} onKeyDown={e => e.key === 'Enter' && validate()} />
+                                        </td>
+                                        <td className="p-4">
+                                            <input type="text" placeholder="Annuité" className={`w-32 p-2 border-2 rounded-md outline-none focus:ring-2 transition-all text-right ${fieldErrors.annuity ? 'border-red-400 bg-red-50 focus:ring-red-200' : fieldCorrect.annuity ? 'border-green-400 bg-green-50 focus:ring-green-200' : 'border-slate-200 focus:ring-indigo-200 focus:border-indigo-400'}`} value={inputs.annuity} onChange={e => handleChange('annuity', e.target.value)} onKeyDown={e => e.key === 'Enter' && validate()} />
+                                        </td>
+                                        <td className="p-4">
+                                            <input type="text" placeholder="Cumul" className={`w-32 p-2 border-2 rounded-md outline-none focus:ring-2 transition-all text-right ${fieldErrors.accumulated ? 'border-red-400 bg-red-50 focus:ring-red-200' : fieldCorrect.accumulated ? 'border-green-400 bg-green-50 focus:ring-green-200' : 'border-slate-200 focus:ring-indigo-200 focus:border-indigo-400'}`} value={inputs.accumulated} onChange={e => handleChange('accumulated', e.target.value)} onKeyDown={e => e.key === 'Enter' && validate()} />
+                                        </td>
+                                        <td className="p-4">
+                                            <input type="text" placeholder="VCN" className={`w-32 p-2 border-2 rounded-md outline-none focus:ring-2 transition-all text-right ${fieldErrors.vcn ? 'border-red-400 bg-red-50 focus:ring-red-200' : fieldCorrect.vcn ? 'border-green-400 bg-green-50 focus:ring-green-200' : 'border-slate-200 focus:ring-indigo-200 focus:border-indigo-400'}`} value={inputs.vcn} onChange={e => handleChange('vcn', e.target.value)} onKeyDown={e => e.key === 'Enter' && validate()} />
+                                        </td>
+                                    </tr>
+                                )}
+                                {solution.slice(rowIndex + 1).map(row => (
+                                    <tr key={row.year} className="opacity-30">
+                                        <td className="p-4">{row.year}</td>
+                                        <td className="p-4">...</td>
+                                        <td className="p-4">...</td>
+                                        <td className="p-4">...</td>
+                                        <td className="p-4">...</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end items-center gap-4">
+                        <Button onClick={validate} disabled={rowIndex >= solution.length}>
+                            <IconCheck className="w-4 h-4 mr-2" /> Valider
+                        </Button>
+                    </div>
+                </div>
+            );
+        };
+
+        const AccountingStep = ({ exercise, onComplete }) => {
+            const [rows, setRows] = useState([{ account: '', debit: '', credit: '' }, { account: '', debit: '', credit: '' }]);
+            const [feedback, setFeedback] = useState(null);
+            const solutionVal = useMemo(() => calculateSolution(exercise)[0].annuity, [exercise]);
+
+            const updateRow = (idx, field, val) => {
+                const newRows = [...rows];
+                newRows[idx][field] = val;
+                setRows(newRows);
+                setFeedback(null);
+            };
+
+            const validate = () => {
+                const clean = s => s.replace(/\s/g, '').trim();
+                let hasDebit = false, hasCredit = false, errMsg = '';
+
+                for (let r of rows) {
+                    const acc = clean(r.account);
+                    const deb = parseInput(r.debit);
+                    const cred = parseInput(r.credit);
+                    if (!acc) continue;
+
+                    if (acc === exercise.debitAccount) {
+                        if (deb > 0 && cred === 0 && isCloseEnough(deb, solutionVal)) hasDebit = true;
+                        else errMsg = `Erreur montant ou colonne pour le compte ${acc}.`;
+                    } else if (acc === exercise.creditAccount) {
+                        if (cred > 0 && deb === 0 && isCloseEnough(cred, solutionVal)) hasCredit = true;
+                        else errMsg = `Erreur montant ou colonne pour le compte ${acc}.`;
+                    } else {
+                        errMsg = `Compte ${acc} incorrect. Utilisez ${exercise.debitAccount} ou ${exercise.creditAccount}.`;
+                    }
+                }
+
+                if (!errMsg && (!hasDebit || !hasCredit)) errMsg = "Écriture incomplète.";
+
+                if (!errMsg && hasDebit && hasCredit) {
+                    setFeedback({ type: 'success', msg: "Écriture correcte !" });
+                    setTimeout(onComplete, 1200);
+                } else {
+                    setFeedback({ type: 'error', msg: errMsg || "Vérifiez votre écriture." });
+                }
+            };
+
+            return (
+                <div className="mt-8 glass-card rounded-2xl shadow-xl border border-white/50 p-7 animate-slide-up hover-lift">
+                    <h3 className="text-xl font-bold text-slate-800 mb-5 flex items-center">
+                        <span className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full mr-3 font-bold shadow-sm">ÉTAPE 2</span>
+                        Comptabilisation (1ère année)
+                    </h3>
+                    <div className="mb-6 border border-slate-200 rounded-lg overflow-hidden">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th className="p-3 w-1/3 border-r">Compte</th>
+                                    <th className="p-3 w-1/3 border-r text-center">Débit (€)</th>
+                                    <th className="p-3 w-1/3 text-center">Crédit (€)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {rows.map((row, i) => (
+                                    <tr key={i}>
+                                        <td className="p-2 border-r"><input type="text" placeholder="Compte" className="w-full p-2 border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200" value={row.account} onChange={e => updateRow(i, 'account', e.target.value)} /></td>
+                                        <td className="p-2 border-r"><input type="text" placeholder="Débit" className="w-full p-2 border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200 text-right" value={row.debit} onChange={e => updateRow(i, 'debit', e.target.value)} /></td>
+                                        <td className="p-2"><input type="text" placeholder="Crédit" className="w-full p-2 border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200 text-right" value={row.credit} onChange={e => updateRow(i, 'credit', e.target.value)} /></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {feedback && (
+                        <div className={`mb-4 p-3 rounded-lg flex items-center text-sm ${feedback.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+                            {feedback.type === 'success' ? <IconCheck className="w-4 h-4 mr-2" /> : <IconX className="w-4 h-4 mr-2" />}
+                            {feedback.msg}
+                        </div>
+                    )}
+                    <div className="flex justify-end gap-3">
+                        <Button onClick={validate}><IconCheck className="w-4 h-4 mr-2" /> Valider l'écriture</Button>
+                    </div>
+                </div>
+            );
+        };
+
+        const VcnCheckStep = ({ exercise, onComplete }) => {
+            const [val, setVal] = useState('');
+            const [err, setErr] = useState(null);
+            const correctVcn = useMemo(() => {
+                const solution = calculateSolution(exercise);
+                // Prendre la VCN après la 3ème année (index 2 car commence à 0)
+                return solution[2] ? solution[2].vcn : solution[solution.length - 1].vcn;
+            }, [exercise]);
+
+            const validate = () => {
+                if (isCloseEnough(parseInput(val), correctVcn)) onComplete();
+                else setErr("Incorrect. Vérifiez votre calcul.");
+            };
+
+            return (
+                <div className="mt-8 glass-card rounded-2xl shadow-xl border border-white/50 p-7 animate-slide-up hover-lift">
+                    <h3 className="text-xl font-bold text-slate-800 mb-5 flex items-center">
+                        <span className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-xs px-3 py-1.5 rounded-full mr-3 font-bold shadow-sm">ÉTAPE 3</span>
+                        Valeur Comptable Nette
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4">Quelle est la VCN du bien après la troisième année ?</p>
+                    <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                        <div className="relative w-full sm:w-64">
+                            <input type="text" placeholder="0,00" className={`w-full p-3 pl-4 pr-8 border rounded-lg text-lg outline-none focus:ring-2 transition-all ${err ? 'border-red-300 bg-red-50' : 'border-slate-200 focus:ring-purple-200'}`} value={val} onChange={e => { setVal(e.target.value); setErr(null); }} onKeyDown={e => e.key === 'Enter' && validate()} />
+                            <span className="absolute right-4 top-4 text-slate-400 font-bold">€</span>
+                        </div>
+                        <Button onClick={validate} className="bg-purple-600 hover:bg-purple-700 focus:ring-purple-500"><IconCheck className="w-4 h-4 mr-2" /> Valider</Button>
+                    </div>
+                    {err && <div className="text-red-600 text-sm flex items-center"><IconX className="w-4 h-4 mr-2" />{err}</div>}
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+
+        const App = () => {
+            const [idx, setIdx] = useState(0);
+            const [step, setStep] = useState(Step.Table);
+            const [theory, setTheory] = useState(false);
+
+            const current = exercises[idx];
+            const isLast = idx === exercises.length - 1;
+
+            const nextStep = () => {
+                if (step === Step.Table) setStep(Step.Accounting);
+                else if (step === Step.Accounting) setStep(Step.BookValueCheck);
+                else if (step === Step.BookValueCheck) setStep(Step.Complete);
+            };
+
+            const nextEx = () => {
+                setIdx(prev => prev + 1);
+                setStep(Step.Table);
+                window.scrollTo(0,0);
+            };
+
+            const reset = () => {
+                setIdx(0);
+                setStep(Step.Table);
+                window.scrollTo(0,0);
+            };
+
+            return (
+                <div className="min-h-screen pb-12">
+                    <header className="glass-card sticky top-0 z-50 shadow-xl border-b border-white/30">
+                        <div className="max-w-4xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+                            <div>
+                                <h1 className="text-3xl font-black gradient-text flex items-center tracking-tight"><IconBook className="mr-3" /> Compta-Master</h1>
+                                <p className="text-[11px] text-slate-500 opacity-90 mt-1 font-medium tracking-wide">Application réalisée pour les élèves de l'Institut Saint-Luc de Frameries par Mr Depret</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => setTheory(!theory)} className="btn-modern text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors px-4 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 shadow-sm">
+                                    {theory ? 'Masquer la théorie' : 'Voir la théorie'}
+                                </button>
+                                <span className="bg-gradient-to-r from-indigo-100 to-purple-100 border border-indigo-200 px-4 py-2 rounded-full text-xs font-bold text-indigo-700 shadow-md">
+                                    Exercice {idx + 1}/{exercises.length}
+                                </span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {theory && (
+                        <div className="glass-card border-b border-white/30 p-8 shadow-lg animate-slide-up">
+                            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-slate-700">
+                                <div className="p-7 bg-gradient-to-br from-blue-50/70 to-blue-100/50 rounded-2xl border-2 border-blue-200 shadow-lg hover-lift">
+                                    <h4 className="font-bold text-xl mb-4 text-blue-800 flex items-center"><span className="w-2 h-8 bg-blue-500 rounded mr-3"></span>Lineaire</h4>
+                                    <ul className="space-y-2.5">
+                                        <li>• <strong>Principe :</strong> Montant constant.</li>
+                                        <li>• <strong>Base :</strong> Coût d'acquisition (HTVA + Frais).</li>
+                                        <li>• <strong>Calcul :</strong> Base / Durée.</li>
+                                    </ul>
+                                </div>
+                                <div className="p-7 bg-gradient-to-br from-orange-50/70 to-orange-100/50 rounded-2xl border-2 border-orange-200 shadow-lg hover-lift">
+                                    <h4 className="font-bold text-xl mb-4 text-orange-800 flex items-center"><span className="w-2 h-8 bg-orange-500 rounded mr-3"></span>Dégressif</h4>
+                                    <ul className="space-y-2.5">
+                                        <li>• <strong>Taux :</strong> Linéaire x 2.</li>
+                                        <li>• <strong>Base :</strong> VCN (début d'année).</li>
+                                        <li>• <strong>Plafond :</strong> Max 40% de l'achat.</li>
+                                        <li>• <strong>Bascule :</strong> On passe au linéaire quand l'annuité dégressive devient inférieure à l'annuité linéaire.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <main className="max-w-4xl mx-auto px-6 py-8">
+                        <div className="glass-card rounded-2xl shadow-xl border border-white/50 p-8 mb-8 relative overflow-hidden hover-lift">
+                            <div className={`absolute top-0 left-0 w-2 h-full ${current.type === AmortizationType.Degressive ? 'bg-gradient-to-b from-orange-500 to-red-500' : 'bg-gradient-to-b from-blue-500 to-indigo-600'}`}></div>
+                            <div className="flex justify-between items-start mb-4 pl-4">
+                                <div>
+                                    <span className={`inline-block px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide mb-3 shadow-md ${current.type === AmortizationType.Degressive ? 'bg-gradient-to-r from-orange-100 to-red-100 text-orange-700' : 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700'}`}>{current.type}</span>
+                                    <h2 className="text-4xl font-black text-slate-800">{current.assetName}</h2>
+                                </div>
+                                <div className="text-right glass-card p-4 rounded-xl border border-slate-200 shadow-lg">
+                                    <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Valeur d'achat</div>
+                                    <div className="text-3xl font-black text-slate-800">{formatCurrency(current.acquisitionCost)} €</div>
+                                </div>
+                            </div>
+                            <p className="pl-4 text-slate-700 text-lg leading-relaxed">{current.description}</p>
+                        </div>
+
+                        <TableStep exercise={current} onComplete={() => nextStep()} />
+                        
+                        {step !== Step.Table && <AccountingStep exercise={current} onComplete={() => nextStep()} />}
+                        
+                        {(step === Step.BookValueCheck || step === Step.Complete) && <VcnCheckStep exercise={current} onComplete={() => setStep(Step.Complete)} />}
+
+                        {step === Step.Complete && (
+                            <div className="mt-12 p-10 glass-card bg-gradient-to-br from-emerald-50/80 to-teal-50/80 border-2 border-emerald-200 rounded-2xl text-center shadow-2xl animate-slide-up">
+                                <div className="inline-flex p-5 bg-white rounded-full shadow-xl text-emerald-600 mb-5 ring-8 ring-emerald-100 animate-pulse-soft"><IconTrophy className="w-16 h-16" /></div>
+                                <h2 className="text-4xl font-black text-emerald-900 mb-3">Exercice terminé !</h2>
+                                <p className="text-emerald-700 text-xl mb-10 font-medium">Bravo, vous maîtrisez cet exercice.</p>
+                                {isLast ? (
+                                    <Button onClick={reset} variant="secondary" className="mx-auto py-3.5 px-8 text-lg"><IconRefresh className="w-5 h-5 mr-2" /> Recommencer tout</Button>
+                                ) : (
+                                    <Button onClick={nextEx} variant="success" className="mx-auto py-3.5 px-10 text-xl hover:-translate-y-1 transform">Exercice Suivant <IconChevronRight className="w-6 h-6 ml-2" /></Button>
+                                )}
+                            </div>
+                        )}
+                    </main>
+                    
+                    <footer className="text-center text-slate-600 text-sm py-8 font-medium glass-card mx-6 rounded-2xl shadow-lg">
+                        Institut Saint-Luc de Frameries &copy; {new Date().getFullYear()}
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
